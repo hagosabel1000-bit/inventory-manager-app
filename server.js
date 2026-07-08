@@ -16,6 +16,10 @@ app.use((req, res, next) => {
     next();
 });
 
+const productRoutes = require('./routes/productRoutes');
+app.use('/products', productRoutes);
+
+
 const authRoutes = require('./routes/authRoutes');
 app.use('/auth', authRoutes);
 
