@@ -1,44 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
-
-require('./models/db'); // Ensure the database connection is established
-
 const app = express();
 
-const path = require('path');
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-// Middleware to log every incoming request to the terminal
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} request to ${req.url}`);
-    next();
-});
-
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Required: Meaningful request logging
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-});
-
-const productRoutes = require('./routes/productRoutes');
-app.use('/products', productRoutes);
-
-
+// Import middleware and routes
+const authMiddleware = require('./middleware/authMiddleware');
 const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
+
+// Use routes
 app.use('/auth', authRoutes);
+// Apply middleware ONLY to product routes
+app.use('/products', authMiddleware, productRoutes);
 
-// Basic test route
-app.get('/', (req, res) => {
-    res.send('Inventory Management System API is running!');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+app.listen(3000, () => console.log('Server is running on port 3000'));
