@@ -6,6 +6,10 @@ require('./models/db'); // Ensure the database connection is established
 
 const app = express();
 
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 // Middleware to log every incoming request to the terminal
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} request to ${req.url}`);
