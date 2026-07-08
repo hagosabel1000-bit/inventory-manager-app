@@ -2,18 +2,17 @@ const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
     host: 'localhost',
-    user: 'root',      // Change if your MySQL username is different
-    password: '1111',      // Add your MySQL password here if you have one
+    user: 'root',      
+    password: '1111',      
     database: 'inventory_db'
 });
 
 connection.connect((err) => {
     if (err) {
-        console.error('CRITICAL ERROR: Could not connect to MySQL');
-        console.error('Error message:', err.message);
+        console.error('Error connecting to the database:' + err.stack);
         return;
     }
-    console.log('Connected to the MySQL database!');
+    console.log('Connected to the MySQL as id ' + connection.threadId);
 });
 
 module.exports = connection;
