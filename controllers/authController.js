@@ -20,7 +20,7 @@ exports.register = async (req, res) => {
         res.status(500).send(error.message);
     }
 };
-
+//Controller for handling user login
 exports.login = (req, res) => {
     const { username, password } = req.body;
     db.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
