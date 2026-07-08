@@ -1,24 +1,31 @@
 const db = require('../models/db');
 
 exports.getAllProducts = (req, res) => {
-    db.query('SELECT * FROM products', (err, results) => {
-        if (err) return res.status(500).json({ message: 'Error fetching products' });
+    // Make sure your SQL query selects the new column
+    db.query('SELECT id, name, quantity, created_by FROM products', (err, results) => {
+        if (err) return res.status(500).json({ message: 'Database error' });
         res.json(results);
     });
 };
 
 exports.addProduct = (req, res) => {
-    console.log("DEBUG: Data received:", req.body); // Check your terminal!
-    const { name, quantity } = req.body;
+    // Check what we are receiving
+    console.log("DEBUG: Data received:", req.body); 
     
-    // Add a check to prevent crashing if data is missing
+    const { name, quantity } = req.body;
+    // Get the username from the token provided by authMiddleware
+    const username = req.user ? req.user.username : 'Unknown';
+    
+    // Check to prevent crashing if data is missing
     if (!name || !quantity) {
         return res.status(400).send("Name and Quantity are required");
     }
 
-    db.query('INSERT INTO products (name, quantity) VALUES (?, ?)', [name, quantity], (err, result) => {
+    // Updated Query: Included 'created_by' column
+    db.query('INSERT INTO products (name, quantity, created_by) VALUES (?, ?, ?)', 
+    [name, quantity, username], (err, result) => {
         if (err) {
-            console.error("DEBUG: Database Error:", err); // This is the gold mine for fixing 500s
+            console.error("DEBUG: Database Error:", err); 
             return res.status(500).send('Error adding product');
         }
         res.status(201).send('Product added successfully');

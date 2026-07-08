@@ -5,13 +5,25 @@ const config = require('../config');
 
 
 exports.register = async (req, res) => {
-    const { username, password } = req.body;
+    // 1. Include phone_number in the request body
+    const { username, password, phone_number } = req.body;
+
+    // 2. Add validation for 10-digit number
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone_number)) {
+        return res.status(400).json({ message: 'Phone number must be exactly 10 digits and numbers only.' });
+    }
+
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], (err, result) => {
+        
+        // 3. Update the SQL query to include the new column
+        db.query('INSERT INTO users (username, password, phone_number) VALUES (?, ?, ?)', 
+        [username, hashedPassword, phone_number], (err, result) => {
             if (err) {
-                // If error is 1062, it means the username already exists
-                if (err.code === 'ER_DUP_ENTRY') return res.status(400).json({ message: 'Username already exists' });
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).json({ message: 'Username already exists' });
+                }
                 return res.status(500).json({ message: 'Database error' });
             }
             res.status(201).json({ message: 'User registered successfully' });
